@@ -56,6 +56,7 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
       - '@request_stack'
+      - '@graphql.buffer.cache'
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
@@ -113,6 +114,9 @@ services:
   graphql.buffer.subrequest:
     class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
     arguments: ['@http_kernel', '@request_stack']
+  graphql.buffer.cache:
+    class: Drupal\graphql\GraphQL\Buffers\CacheBuffer
+    arguments: ['@entity_type.manager', '@cache.graphql.results'  ]
 
   # Contextual language handling https://www.drupal.org/project/drupal/issues/2952789
   graphql.language_context:

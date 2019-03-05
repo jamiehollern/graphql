@@ -7,8 +7,10 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\GraphQL\Buffers\BufferBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
+use GraphQL\Deferred;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -60,6 +62,8 @@ class QueryProcessor {
    */
   protected $requestStack;
 
+  protected $buffer;
+
   /**
    * Processor constructor.
    *
@@ -76,12 +80,14 @@ class QueryProcessor {
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
     CacheBackendInterface $cacheBackend,
-    RequestStack $requestStack
+    RequestStack $requestStack,
+    BufferBase $buffer
   ) {
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->cacheBackend = $cacheBackend;
     $this->requestStack = $requestStack;
+    $this->buffer = $buffer;
   }
 
   /**
@@ -235,9 +241,13 @@ class QueryProcessor {
       if (($contextCache = $this->cacheBackend->get($contextCacheId))) {
         $contexts = $contextCache->data ?? [];
         $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
-        if (($cache = $this->cacheBackend->get($cid))) {
-          return $adapter->createFulfilled($cache->data);
-        }
+        $resolver = $this->buffer->add('read', $cid);
+        return new Deferred(function () use ($resolver, $cid, $adapter) {
+          if (($cache = $resolver($cid))) {
+            return $adapter->createFulfilled($cache->data);
+          }
+          return NULL;
+        });
       }
     }
 
