@@ -64,7 +64,6 @@ class CacheBuffer extends BufferBase {
    * {@inheritdoc}
    */
   public function resolveBufferArray(array $buffer) {
-
     // Get CIDS.
     $gets = array_filter($buffer, function ($item) {
       return $item['type'] === 'read';
@@ -90,57 +89,6 @@ class CacheBuffer extends BufferBase {
 
       return isset($cache[$item['cid']]) ? $cache[$item['cid']] : NULL;
     }, $gets);
-
-
-//    return $this->cacheBackend->get($cid);
-    // Set CIDS.
-
-//    $type = reset($buffer)['type'];
-//    $cids = array_map(function (\ArrayObject $item) {
-//      return (array) $item['cid'];
-//    }, $buffer);
-//
-//
-//    $adapter = new SyncPromiseAdapter();
-//    if (($cache = $this->cacheBackend->getMultiple($cids))) {
-//      return $adapter->createFulfilled($cache->data);
-//    }$adapter = new SyncPromiseAdapter();
-    //    if (($cache = $this->cacheBackend->getMultiple($get_cids))) {
-    //      return $adapter->createFulfilled($cache->data);
-    //    }
-
-
-
-
-    // end
-
-
-//    $type = reset($buffer)['type'];
-//    $ids = array_map(function (\ArrayObject $item) {
-//      return (array) $item['id'];
-//    }, $buffer);
-//
-//    $ids = call_user_func_array('array_merge', $ids);
-//    $ids = array_values(array_unique($ids));
-//
-//    // Load the buffered entities.
-//    $entities = $this->entityTypeManager
-//      ->getStorage($type)
-//      ->loadMultiple($ids);
-//
-//    return array_map(function ($item) use ($entities) {
-//      if (is_array($item['id'])) {
-//        return array_reduce($item['id'], function ($carry, $current) use ($entities) {
-//          if (!empty($entities[$current])) {
-//            return $carry + [$current => $entities[$current]];
-//          }
-//
-//          return $carry;
-//        }, []);
-//      }
-//
-//      return isset($entities[$item['id']]) ? $entities[$item['id']] : NULL;
-//    }, $buffer);
   }
 
 }
