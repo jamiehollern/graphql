@@ -243,8 +243,8 @@ class QueryProcessor {
         $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
         $resolver = $this->buffer->add('read', $cid);
         return new Deferred(function () use ($resolver, $cid, $adapter) {
-          if (($cache = $resolver($cid))) {
-            return $adapter->createFulfilled($cache->data);
+          if (($cache = $resolver())) {
+            return $cache->data;
           }
           return NULL;
         });
